@@ -5,10 +5,14 @@
   (/ (* angle Math/PI)
      180.0))
 
-(defn end-point [x y angle length]
+(defn end-point
   "Compute the end point of a line segment given the
 starting point, the length of the segment and the direction"
-  (let [trans-fn #(+ %1 (* %2 (%3 %4)))]
+  ([[x y] angle length]
+   (end-point x y angle length))
 
-    [(trans-fn x length  #(Math/sin %) angle)
-     (trans-fn y length  #(Math/cos %) angle)]))
+  ([x y angle length]
+   (let [trans-fn #(+ %1 (* %2 (%3 %4)))]
+
+     [(trans-fn x length  #(Math/cos %) angle)
+      (trans-fn y length  #(Math/sin %) angle)])))
