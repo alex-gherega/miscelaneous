@@ -21,7 +21,8 @@
   (vec (reduce (fn [cls x]
 
                  (let [cl (dec (light-classify start end n x))
-                       _ (println " DBG: " cls x cl)]
+                       ;_ (println " DBG: " start end cls x cl)
+                       ]
                    (assoc cls cl (inc (cls cl)))))
                (classes n)
                xs)))
@@ -31,15 +32,33 @@
         :default 0))
 
 (defn to-percentage [hist scale]
-  (let [peak (apply max hist)]
-    (vec (map #(* scale (/ % peak)) hist))))
+  (let [peak (apply max hist)
+        res (vec (map #(* scale (/ % peak)) hist))
+        ;_ (println res)
+        ]
+    res))
 
 (defn to-2d [hist]
   (loop [hist hist array []]
     (if (every? zero? hist)
       array
       (recur (vec (map #(dec-or-zero %) hist))
-             (conj array (vec (map #(if (pos? %) " * " "   ") hist)))))))
+             (conj array (vec (map #(if (pos? %) "*" " ") hist)))))))
 
-(defn draw-asci-hist [hist-2d]
+(defn str-hist [hist-2d]
   (vec (reduce #(str %1 (apply str %2) "\n") "" hist-2d)))
+
+(defn draw-asci-hist [start end n xs & scale]
+  (let [scale (or (first scale) 23)
+       ; _ (println scale)
+        ]
+    (-> (histografy start end n xs)
+        (to-percentage scale)
+        to-2d
+        reverse
+        str-hist
+        print)))
+
+(defn example [scale]
+  (let [xs (repeatedly 100 (partial rand-int 301))]
+    (draw-asci-hist 0 300 80 xs scale)))
