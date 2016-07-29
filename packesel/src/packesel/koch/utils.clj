@@ -5,10 +5,10 @@
 
 (defn scale
   ([seglen]
-   (/ seglen (:scale (pakonf/read-conf))))
+   (double (/ seglen (:scale (pakonf/read-conf)))))
 
   ([seglen factor]
-   (/ seglen factor)))
+   (double (/ seglen factor))))
 
 
 (defn koch-to-svg [koch-ds line-fn]

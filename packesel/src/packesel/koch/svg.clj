@@ -31,20 +31,22 @@
 
   ([angle]
    (let [seglen (pakils/scale @konf/seglen)
-         e-point (kils/end-point @s-point
-                                 (kils/to-rads angle)
-                                 seglen)]
-     (update-spt e-point)
-     [:L e-point]))
+         ;; e-point (kils/end-point @s-point
+         ;;                         (kils/to-rads angle)
+         ;;                         seglen)
+         ]
+     ;(update-spt e-point)
+     ;[:L e-point]
+     (draw-line seglen angle)))
 
-  ([angle len]
-   (draw-line ((juxt :sx :sy) (pakonf/read-conf))
-              angle
-              len))
+  ([len angle]
+   (draw-line @s-point
+              len
+              angle))
 
-  ([start angle len]
+  ([start len angle]
    (let [[sx sy] start
-         [ex ey :as end] (kils/end-point sx sy (kils/to-rads angle) len)]
+         [ex ey :as end] (kils/end-point start (kils/to-rads angle) len)]
      [:L end])))
 
 (defn koch-fn [k-expr angle]
@@ -56,8 +58,11 @@
     (into k-expr [:L e-point])))
 
 
+(declare do-koch-svg-fn)
 
-(defn do-koch-svg
+(def do-koch-svg (memoize do-koch-svg-fn))
+
+(defn- do-koch-svg-fn
   ([n]
    (do-koch-svg n (kore/do-koch n
                                 #(kore/do-koch-line % :L
@@ -65,7 +70,13 @@
                                                       (kules/vec-koch-it fwd
                                                                          @konf/tura))))))
   ([n koch-ds]
-   (pakils/koch-to-svg (flatten koch-ds) draw-line)))
+   (let [draw-line (fn [] (let [seglen (pakils/scale @konf/seglen
+                                                     (* (Math/pow 3 n) (:scale (pakonf/read-conf))))
+                                res (draw-line seglen
+                                               @konf/cuda)]
+                            (update-spt (second res))
+                            res))]
+     (pakils/koch-to-svg (flatten koch-ds) draw-line))))
 
 (defn do-koch-svg-line [n]
 

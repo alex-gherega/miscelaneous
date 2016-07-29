@@ -7,8 +7,7 @@
             :height "2000"
             :sx 50 ;; start x
             :sy 100 ;; start y
-            :scale 3000
-            }))
+            :scale 50}))
 
 (defn read-conf []
   @conf)
